@@ -1,1 +1,7 @@
 core/keys.json
+.venv/
+.playwright-mcp/
+core-logs/
+core-data/
+__pycache__/
+*.pyc
