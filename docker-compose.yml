@@ -8,7 +8,7 @@ services:
   chat:
     ports:
       - "3000:3000"
-    image: epam/ai-dial-chat:development
+    image: epam/ai-dial-chat:0.48.1
 #    platform: linux/amd64
     depends_on:
       - themes
@@ -20,6 +20,13 @@ services:
       DIAL_API_KEY: "dial_api_key"
       ENABLED_FEATURES: "conversations-section,prompts-section,top-settings,top-clear-conversation,top-chat-info,top-chat-model-settings,empty-chat-settings,header,footer,request-api-key,report-an-issue,likes,conversations-sharing,prompts-sharing,input-files,attachments-manager,conversations-publishing,prompts-publishing,custom-logo,input-links,custom-applications,message-templates,marketplace,quick-apps,code-apps,mindmap-apps"
       KEEP_ALIVE_TIMEOUT: ${CHAT_KEEP_ALIVE_TIMEOUT:-20000}
+
+  adapter-dial:
+    image: epam/ai-dial-adapter-dial:development
+#    platform: linux/amd64
+    environment:
+      DIAL_URL: "http://core:8080"
+      LOG_LEVEL: "INFO"
 
   redis:
     image: redis:7.2.4-alpine3.19
@@ -42,12 +49,14 @@ services:
       - "8080:8080"
     image: epam/ai-dial-core:development
 #    platform: linux/amd64
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       'AIDIAL_SETTINGS': '/opt/settings/settings.json'
       'JAVA_OPTS': '-Dgflog.config=/opt/settings/gflog.xml'
       'LOG_DIR': '/app/log'
       'STORAGE_DIR': '/app/data'
-      'aidial.config.files': '["/opt/config/config.json"]'
+      'aidial.config.files': '["/opt/config/config.json", "/opt/config/keys.json"]'
       'aidial.storage.overrides': '{ "jclouds.filesystem.basedir": "data" }'
       'aidial.redis.singleServerConfig.address': 'redis://redis:6379'
     depends_on:
